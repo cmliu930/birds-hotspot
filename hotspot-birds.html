@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云南观鸟热点 - 2月鸟种清单</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        header { text-align: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 3px solid #667eea; }
+        h1 { color: #333; font-size: 32px; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 16px; }
+        .stats { display: flex; justify-content: center; gap: 40px; margin: 20px 0; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 36px; font-weight: bold; color: #667eea; }
+        .stat-label { color: #666; font-size: 14px; }
+        .location-tabs { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+        .location-tab { padding: 12px 24px; background: #f0f0f0; border: 2px solid #ddd; border-radius: 25px; cursor: pointer; transition: all 0.3s; font-weight: 500; }
+        .location-tab:hover { background: #e0e0e0; }
+        .location-tab.active { background: #667eea; color: white; border-color: #667eea; }
+        .search-box { margin: 30px 0; text-align: center; }
+        .search-box input { width: 100%; max-width: 500px; padding: 12px 20px; border: 2px solid #ddd; border-radius: 25px; font-size: 16px; transition: border-color 0.3s; }
+        .search-box input:focus { outline: none; border-color: #667eea; }
+        .bird-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; margin-top: 20px; }
+        .bird-item { padding: 12px 16px; background: #f8f9fa; border-radius: 8px; cursor: pointer; transition: all 0.2s; border-left: 3px solid transparent; display: flex; justify-content: space-between; align-items: center; }
+        .bird-item:hover { background: #667eea; color: white; transform: translateX(5px); border-left-color: #4c51bf; }
+        .bird-item.special { background: #fff8e1; border-left-color: #ff9800; font-weight: 500; }
+        .bird-item.special:hover { background: #ff9800; color: white; }
+        .bird-name { flex: 1; }
+        .location-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .location-tag { font-size: 10px; padding: 2px 6px; border-radius: 8px; font-weight: normal; white-space: nowrap; }
+        .tag-yingjiang { background: #4CAF50; color: white; }
+        .tag-ruili { background: #2196F3; color: white; }
+        .tag-xiniaog { background: #FF9800; color: white; }
+        .category { margin-bottom: 30px; }
+        .category h3 { color: #667eea; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; font-size: 18px; }
+        .special-birds-section { background: #fff8e1; padding: 30px; border-radius: 12px; margin: 30px 0; border: 2px solid #ff9800; }
+        .stats-section { background: #f0f4ff; padding: 30px; border-radius: 12px; margin: 30px 0; }
+        .charts-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; margin-top: 20px; }
+        .chart-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .chart-box h3 { color: #667eea; margin-bottom: 15px; font-size: 16px; }
+        .chart { display: flex; flex-direction: column; gap: 10px; }
+        .chart-bar { display: flex; align-items: center; gap: 10px; }
+        .bar-label { min-width: 100px; font-size: 13px; color: #333; font-weight: 500; }
+        .bar-container { flex: 1; height: 24px; background: #e0e0e0; border-radius: 4px; position: relative; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); transition: width 0.3s; }
+        .bar-value { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #333; font-weight: 500; }
+        @media (max-width: 768px) { 
+            .container { padding: 20px; } 
+            h1 { font-size: 24px; } 
+            .bird-list { grid-template-columns: 1fr; } 
+            .charts-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🦜 云南观鸟热点 - 2月鸟种清单</h1>
+            <p class="subtitle">云南省德宏州 · 盈江 | 瑞丽 | 犀鸟谷</p>
+            <p class="subtitle" style="margin-top: 10px; color: #999; font-size: 13px;">✅ 数据来源：真实观鸟记录</p>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number" id="totalCount">295</div><div class="stat-label">鸟种总数</div></div>
+                <div class="stat-item"><div class="stat-number" id="visibleCount">295</div><div class="stat-label">当前显示</div></div>
+            </div>
+            <div class="stats" style="font-size: 14px; color: #666; gap: 20px;">
+                <div>盈江: 261种</div>
+                <div>瑞丽: 170种</div>
+                <div>犀鸟谷: 116种</div>
+            </div>
+        </header>
+        <div class="location-tabs">
+            <div class="location-tab active" onclick="filterLocation('all')">全部地点</div>
+            <div class="location-tab" onclick="filterLocation('yingjiang')">盈江县 (261)</div>
+            <div class="location-tab" onclick="filterLocation('ruili')">瑞丽市 (170)</div>
+            <div class="location-tab" onclick="filterLocation('xiniaog')">犀鸟谷 (116)</div>
+        </div>
+        <div class="search-box"><input type="text" id="searchInput" placeholder="搜索鸟种名称..."></div>
+
+        <div class="special-birds-section">
+            <h2 style="text-align: center; color: #ff9800; margin: 30px 0 20px;">⭐ 特色鸟种 (17种)</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 14px;">珍稀、特有或具有重要观赏价值的鸟种</p>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('双角犀鸟')" data-locations="xiniaog"><span class="bird-name">⭐ 双角犀鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('冠斑犀鸟')" data-locations="xiniaog"><span class="bird-name">⭐ 冠斑犀鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('花冠皱盔犀鸟')" data-locations="xiniaog"><span class="bird-name">⭐ 花冠皱盔犀鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('灰孔雀雉')" data-locations="yingjiang,xiniaog"><span class="bird-name">⭐ 灰孔雀雉</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('白颊山鹧鸪')" data-locations="yingjiang"><span class="bird-name">⭐ 白颊山鹧鸪</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('红腿小隼')" data-locations="yingjiang"><span class="bird-name">⭐ 红腿小隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('大金背啄木鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">⭐ 大金背啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('大拟啄木鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">⭐ 大拟啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('凤头雨燕')" data-locations="yingjiang,xiniaog"><span class="bird-name">⭐ 凤头雨燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('绿嘴地鹃')" data-locations="xiniaog"><span class="bird-name">⭐ 绿嘴地鹃</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('红头鹃鹑')" data-locations="xiniaog,ruili"><span class="bird-name">⭐ 红头鹃鹑</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('灰头龙鸟')" data-locations="xiniaog,ruili"><span class="bird-name">⭐ 灰头龙鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('花头鹦鹉')" data-locations="ruili"><span class="bird-name">⭐ 花头鹦鹉</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('长尾阔嘴鸟')" data-locations="ruili"><span class="bird-name">⭐ 长尾阔嘴鸟</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('银胸阔嘴鸟')" data-locations="ruili"><span class="bird-name">⭐ 银胸阔嘴鸟</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('灰喉燕尾')" data-locations="ruili"><span class="bird-name">⭐ 灰喉燕尾</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('缅甸斑嘴鸭')" data-locations="ruili"><span class="bird-name">⭐ 缅甸斑嘴鸭</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2 style="text-align: center; color: #667eea; margin: 40px 0 20px;">📊 科属统计分析</h2>
+            
+            <div class="charts-container">
+                <div class="chart-box">
+                    <h3>目(Order)分布 - 共19个目</h3>
+                    <div class="chart">
+                        <div class="chart-bar">
+                            <div class="bar-label">雀形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 66.4%"></div>
+                                <span class="bar-value">196种 (66.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鸻形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.7%"></div>
+                                <span class="bar-value">11种 (3.7%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">啄木鸟目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.7%"></div>
+                                <span class="bar-value">11种 (3.7%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹰形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.4%"></div>
+                                <span class="bar-value">10种 (3.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鸡形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.4%"></div>
+                                <span class="bar-value">7种 (2.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鸽形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.4%"></div>
+                                <span class="bar-value">7种 (2.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鸮形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.4%"></div>
+                                <span class="bar-value">7种 (2.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹈形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.0%"></div>
+                                <span class="bar-value">6种 (2.0%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">佛法僧目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.0%"></div>
+                                <span class="bar-value">6种 (2.0%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">夜鹰目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.7%"></div>
+                                <span class="bar-value">5种 (1.7%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">雁形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.4%"></div>
+                                <span class="bar-value">4种 (1.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">犀鸟目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.4%"></div>
+                                <span class="bar-value">4种 (1.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">隼形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.4%"></div>
+                                <span class="bar-value">4种 (1.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹃形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.0%"></div>
+                                <span class="bar-value">3种 (1.0%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鲣鸟目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 1.0%"></div>
+                                <span class="bar-value">3种 (1.0%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹦鹉目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 0.7%"></div>
+                                <span class="bar-value">2种 (0.7%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">䴙䴘目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 0.3%"></div>
+                                <span class="bar-value">1种 (0.3%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹤形目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 0.3%"></div>
+                                <span class="bar-value">1种 (0.3%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">咬鹃目</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 0.3%"></div>
+                                <span class="bar-value">1种 (0.3%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-box">
+                    <h3>科(Family)分布 - Top 10</h3>
+                    <div class="chart">
+                        <div class="chart-bar">
+                            <div class="bar-label">鹟科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 10.8%"></div>
+                                <span class="bar-value">32种 (10.8%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">噪鹛科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 6.1%"></div>
+                                <span class="bar-value">18种 (6.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">柳莺科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 5.1%"></div>
+                                <span class="bar-value">15种 (5.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹎科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 4.7%"></div>
+                                <span class="bar-value">14种 (4.7%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">林鹛科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 4.1%"></div>
+                                <span class="bar-value">12种 (4.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹰科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.1%"></div>
+                                <span class="bar-value">9种 (3.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">椋鸟科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.1%"></div>
+                                <span class="bar-value">9种 (3.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鹡鸰科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 3.1%"></div>
+                                <span class="bar-value">9种 (3.1%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">雉科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.4%"></div>
+                                <span class="bar-value">7种 (2.4%)</span>
+                            </div>
+                        </div>
+                        <div class="chart-bar">
+                            <div class="bar-label">鸠鸽科</div>
+                            <div class="bar-container">
+                                <div class="bar-fill" style="width: 2.4%"></div>
+                                <span class="bar-value">7种 (2.4%)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h3>🐦 雉类与鸭类 (13种)</h3>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('白颊山鹧鸪')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 白颊山鹧鸪</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑嘴鸭')" data-locations="yingjiang"><span class="bird-name">斑嘴鸭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('赤麻鸭')" data-locations="yingjiang,xiniaog"><span class="bird-name">赤麻鸭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐胸山鹧鸪')" data-locations="xiniaog"><span class="bird-name">褐胸山鹧鸪</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红喉山鹧鸪')" data-locations="yingjiang,ruili"><span class="bird-name">红喉山鹧鸪</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红原鸡')" data-locations="yingjiang,ruili"><span class="bird-name">红原鸡</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('灰孔雀雉')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 灰孔雀雉</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('距翅麦鸡')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">距翅麦鸡</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('缅甸斑嘴鸭')" data-locations="ruili"><span class="bird-name">⭐ 缅甸斑嘴鸭</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('南亚斑嘴鸭')" data-locations="yingjiang"><span class="bird-name">南亚斑嘴鸭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('普通秋沙鸭')" data-locations="yingjiang"><span class="bird-name">普通秋沙鸭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('肉垂麦鸡')" data-locations="xiniaog"><span class="bird-name">肉垂麦鸡</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小䴙䴘')" data-locations="yingjiang"><span class="bird-name">小䴙䴘</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鸠鸽类 (7种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('斑尾鹃鸠')" data-locations="yingjiang,ruili"><span class="bird-name">斑尾鹃鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('绿翅金鸠')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">绿翅金鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('山斑鸠')" data-locations="xiniaog"><span class="bird-name">山斑鸠</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('山皇鸠')" data-locations="yingjiang,ruili"><span class="bird-name">山皇鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('楔尾绿鸠')" data-locations="yingjiang,ruili"><span class="bird-name">楔尾绿鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('针尾绿鸠')" data-locations="yingjiang,ruili"><span class="bird-name">针尾绿鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('珠颈斑鸠')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">珠颈斑鸠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹃类 (8种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('暗灰鹃鵙')" data-locations="yingjiang,ruili"><span class="bird-name">暗灰鹃鵙</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大鹰鹃')" data-locations="yingjiang,ruili"><span class="bird-name">大鹰鹃</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐翅鸦鹃')" data-locations="xiniaog"><span class="bird-name">褐翅鸦鹃</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐冠鹃隼')" data-locations="yingjiang,ruili"><span class="bird-name">褐冠鹃隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('红头鹃鹑')" data-locations="xiniaog,ruili"><span class="bird-name">⭐ 红头鹃鹑</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红头咬鹃')" data-locations="xiniaog"><span class="bird-name">红头咬鹃</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('绿嘴地鹃')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 绿嘴地鹃</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕三趾鹑')" data-locations="yingjiang"><span class="bird-name">棕三趾鹑</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 夜鹰与猫头鹰 (8种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('斑头鸺鹠')" data-locations="yingjiang,ruili"><span class="bird-name">斑头鸺鹠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('仓鸮')" data-locations="yingjiang"><span class="bird-name">仓鸮</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄嘴角鸮')" data-locations="yingjiang,ruili"><span class="bird-name">黄嘴角鸮</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('林雕鸮')" data-locations="yingjiang,ruili"><span class="bird-name">林雕鸮</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('领角鸮')" data-locations="yingjiang,ruili"><span class="bird-name">领角鸮</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('领鸺鹠')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">领鸺鹠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('鹰鸮')" data-locations="yingjiang,ruili"><span class="bird-name">鹰鸮</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('长尾夜鹰')" data-locations="yingjiang"><span class="bird-name">长尾夜鹰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 雨燕 (3种)</h3>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('凤头雨燕')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 凤头雨燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小白腰雨燕')" data-locations="yingjiang,xiniaog"><span class="bird-name">小白腰雨燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕雨燕')" data-locations="yingjiang"><span class="bird-name">棕雨燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 燕类 (16种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白额燕尾')" data-locations="yingjiang"><span class="bird-name">白额燕尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑背燕尾')" data-locations="xiniaog"><span class="bird-name">斑背燕尾</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑腰燕')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">斑腰燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('短嘴金丝燕')" data-locations="yingjiang"><span class="bird-name">短嘴金丝燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('河燕鸥')" data-locations="yingjiang"><span class="bird-name">河燕鸥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑背燕尾')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑背燕尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰背燕尾')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰背燕尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰喉沙燕')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰喉沙燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('灰喉燕尾')" data-locations="ruili"><span class="bird-name">⭐ 灰喉燕尾</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰燕鸻')" data-locations="yingjiang"><span class="bird-name">灰燕鸻</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰燕鵙')" data-locations="yingjiang,ruili"><span class="bird-name">灰燕鵙</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('家燕')" data-locations="yingjiang,xiniaog"><span class="bird-name">家燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('金腰燕')" data-locations="yingjiang,xiniaog"><span class="bird-name">金腰燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('线尾燕')" data-locations="yingjiang,xiniaog"><span class="bird-name">线尾燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小燕尾')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">小燕尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('崖沙燕')" data-locations="yingjiang"><span class="bird-name">崖沙燕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 蜂虎与翠鸟 (6种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白胸翡翠')" data-locations="yingjiang"><span class="bird-name">白胸翡翠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑鱼狗')" data-locations="yingjiang"><span class="bird-name">斑鱼狗</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('鹳嘴翡翠')" data-locations="yingjiang"><span class="bird-name">鹳嘴翡翠</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝须夜蜂虎')" data-locations="yingjiang,ruili"><span class="bird-name">蓝须夜蜂虎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('绿喉蜂虎')" data-locations="yingjiang"><span class="bird-name">绿喉蜂虎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('普通翠鸟')" data-locations="yingjiang"><span class="bird-name">普通翠鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 犀鸟类 (3种)</h3>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('冠斑犀鸟')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 冠斑犀鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('花冠皱盔犀鸟')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 花冠皱盔犀鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('双角犀鸟')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 双角犀鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 戴胜与啄木鸟 (12种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('斑姬啄木鸟')" data-locations="yingjiang"><span class="bird-name">斑姬啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('赤胸拟啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">赤胸拟啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大黄冠啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">大黄冠啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('大金背啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 大金背啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('大拟啄木鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">⭐ 大拟啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('戴胜')" data-locations="yingjiang,ruili"><span class="bird-name">戴胜</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄冠啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">黄冠啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰头绿啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">灰头绿啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝耳拟啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">蓝耳拟啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝喉拟啄木鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">蓝喉拟啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纹胸啄木鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">纹胸啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('星头啄木鸟')" data-locations="yingjiang,ruili"><span class="bird-name">星头啄木鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹦鹉 (2种)</h3>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('花头鹦鹉')" data-locations="xiniaog"><span class="bird-name">⭐ 花头鹦鹉</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('亚历山大鹦鹉')" data-locations="yingjiang"><span class="bird-name">亚历山大鹦鹉</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 阔嘴鸟与八色鸫 (4种)</h3>
+            <div class="bird-list">
+                <div class="bird-item special" onclick="showBirdInfo('灰头龙鸟')" data-locations="xiniaog,ruili"><span class="bird-name">⭐ 灰头龙鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝枕八色鸫')" data-locations="yingjiang"><span class="bird-name">蓝枕八色鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('银胸阔嘴鸟')" data-locations="ruili"><span class="bird-name">⭐ 银胸阔嘴鸟</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('长尾阔嘴鸟')" data-locations="ruili"><span class="bird-name">⭐ 长尾阔嘴鸟</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹨类 (5种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('东方田鹨')" data-locations="xiniaog"><span class="bird-name">东方田鹨</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('粉红胸鹨')" data-locations="yingjiang"><span class="bird-name">粉红胸鹨</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腹鹨')" data-locations="yingjiang"><span class="bird-name">黄腹鹨</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('树鹨')" data-locations="xiniaog"><span class="bird-name">树鹨</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('田鹨')" data-locations="yingjiang"><span class="bird-name">田鹨</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹎类 (18种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白喉冠鹎')" data-locations="yingjiang,ruili"><span class="bird-name">白喉冠鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白喉红臀鹎')" data-locations="yingjiang,ruili"><span class="bird-name">白喉红臀鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('凤头雀嘴鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">凤头雀嘴鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑翅雀鹎')" data-locations="yingjiang,ruili"><span class="bird-name">黑翅雀鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑短脚鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑短脚鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑冠黄鹎')" data-locations="yingjiang,ruili"><span class="bird-name">黑冠黄鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑喉红臀鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑喉红臀鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红耳鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">红耳鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腹冠鹎')" data-locations="yingjiang,ruili"><span class="bird-name">黄腹冠鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄绿鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黄绿鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄臀鹎')" data-locations="yingjiang,ruili"><span class="bird-name">黄臀鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰短脚鹎')" data-locations="yingjiang,ruili"><span class="bird-name">灰短脚鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰眼短脚鹎')" data-locations="yingjiang,ruili"><span class="bird-name">灰眼短脚鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('金额叶鹎')" data-locations="yingjiang,ruili"><span class="bird-name">金额叶鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝翅叶鹎')" data-locations="ruili"><span class="bird-name">蓝翅叶鹎</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('绿翅短脚鹎')" data-locations="yingjiang,ruili"><span class="bird-name">绿翅短脚鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('西南橙腹叶鹎')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">西南橙腹叶鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纵纹绿鹎')" data-locations="yingjiang,ruili"><span class="bird-name">纵纹绿鹎</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 柳莺与叶鹎 (14种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('暗绿柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">暗绿柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('橙斑翅柳莺')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">橙斑翅柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('淡眉柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">淡眉柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('冠纹柳莺')" data-locations="ruili"><span class="bird-name">冠纹柳莺</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐柳莺')" data-locations="yingjiang,xiniaog"><span class="bird-name">褐柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('华西柳莺')" data-locations="yingjiang,xiniaog"><span class="bird-name">华西柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄眉柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">黄眉柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄胸柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">黄胸柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腰柳莺')" data-locations="yingjiang"><span class="bird-name">黄腰柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗头树莺')" data-locations="ruili"><span class="bird-name">栗头树莺</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('西南冠纹柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">西南冠纹柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('云南白斑尾柳莺')" data-locations="yingjiang,ruili"><span class="bird-name">云南白斑尾柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕腹柳莺')" data-locations="xiniaog"><span class="bird-name">棕腹柳莺</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕眉柳莺')" data-locations="yingjiang"><span class="bird-name">棕眉柳莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹪莺与扇尾莺 (9种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('暗冕山鹪莺')" data-locations="yingjiang"><span class="bird-name">暗冕山鹪莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白喉山鹪莺')" data-locations="yingjiang"><span class="bird-name">白喉山鹪莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白喉扇尾鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">白喉扇尾鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纯色山鹪莺')" data-locations="yingjiang"><span class="bird-name">纯色山鹪莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腹山鹪莺')" data-locations="yingjiang"><span class="bird-name">黄腹山鹪莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腹扇尾鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黄腹扇尾鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰腹地莺')" data-locations="yingjiang,ruili"><span class="bird-name">灰腹地莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰胸山鹪莺')" data-locations="yingjiang,xiniaog"><span class="bird-name">灰胸山鹪莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('扇尾沙锥')" data-locations="yingjiang"><span class="bird-name">扇尾沙锥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 雀鹛与鸦雀 (7种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白眶雀鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">白眶雀鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐脸雀鹛')" data-locations="yingjiang,ruili"><span class="bird-name">褐脸雀鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐胁雀鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">褐胁雀鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑眉鸦雀')" data-locations="yingjiang,ruili"><span class="bird-name">黑眉鸦雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红头鸦雀')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">红头鸦雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰头鸦雀')" data-locations="xiniaog"><span class="bird-name">灰头鸦雀</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('云南雀鹛')" data-locations="ruili"><span class="bird-name">云南雀鹛</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 噪鹛与凤鹛 (27种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白腹凤鹛')" data-locations="yingjiang,ruili"><span class="bird-name">白腹凤鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白冠噪鹛')" data-locations="yingjiang,ruili"><span class="bird-name">白冠噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白颊噪鹛')" data-locations="yingjiang,xiniaog"><span class="bird-name">白颊噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑胸钩嘴鹛')" data-locations="yingjiang"><span class="bird-name">斑胸钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑胸噪鹛')" data-locations="yingjiang"><span class="bird-name">斑胸噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑喉噪鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑喉噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑领噪鹛')" data-locations="yingjiang,ruili"><span class="bird-name">黑领噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑头穗鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑头穗鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红翅薮鹛')" data-locations="yingjiang,xiniaog"><span class="bird-name">红翅薮鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红头穗鹛')" data-locations="yingjiang,ruili"><span class="bird-name">红头穗鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红尾噪鹛')" data-locations="yingjiang"><span class="bird-name">红尾噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红嘴钩嘴鹛')" data-locations="yingjiang"><span class="bird-name">红嘴钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄喉穗鹛')" data-locations="yingjiang,ruili"><span class="bird-name">黄喉穗鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄颈凤鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黄颈凤鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰头钩嘴鹛')" data-locations="yingjiang,ruili"><span class="bird-name">灰头钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰胁噪鹛')" data-locations="yingjiang"><span class="bird-name">灰胁噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('金头穗鹛')" data-locations="ruili,xiniaog"><span class="bird-name">金头穗鹛</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝翅希鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">蓝翅希鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝翅噪鹛')" data-locations="yingjiang"><span class="bird-name">蓝翅噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗耳凤鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">栗耳凤鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗颈噪鹛')" data-locations="yingjiang,xiniaog"><span class="bird-name">栗颈噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小黑领噪鹛')" data-locations="yingjiang,ruili"><span class="bird-name">小黑领噪鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('长嘴钩嘴鹛')" data-locations="yingjiang"><span class="bird-name">长嘴钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕颈钩嘴鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">棕颈钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕颏噪鹛')" data-locations="xiniaog"><span class="bird-name">棕颏噪鹛</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕头钩嘴鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">棕头钩嘴鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕胸雅鹛')" data-locations="yingjiang,ruili"><span class="bird-name">棕胸雅鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹛类 (11种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白头鵙鹛')" data-locations="ruili"><span class="bird-name">白头鵙鹛</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('短尾鹪鹛')" data-locations="xiniaog"><span class="bird-name">短尾鹪鹛</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红顶鹛')" data-locations="yingjiang"><span class="bird-name">红顶鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰奇鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰奇鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('金眼鹛雀')" data-locations="yingjiang"><span class="bird-name">金眼鹛雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗背奇鹛')" data-locations="yingjiang,xiniaog"><span class="bird-name">栗背奇鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗额斑翅鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">栗额斑翅鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('瑙蒙短尾鹛')" data-locations="yingjiang,ruili"><span class="bird-name">瑙蒙短尾鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纹胸鹛')" data-locations="yingjiang,ruili"><span class="bird-name">纹胸鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('长尾奇鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">长尾奇鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕头幽鹛')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">棕头幽鹛</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 太阳鸟与啄花鸟 (3种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('黑胸太阳鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">黑胸太阳鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腰太阳鸟')" data-locations="xiniaog"><span class="bird-name">黄腰太阳鸟</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝喉太阳鸟')" data-locations="yingjiang,ruili"><span class="bird-name">蓝喉太阳鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 绣眼鸟 (1种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('灰腹绣眼鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰腹绣眼鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 山椒鸟 (3种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('赤红山椒鸟')" data-locations="yingjiang,ruili"><span class="bird-name">赤红山椒鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('短嘴山椒鸟')" data-locations="yingjiang,ruili"><span class="bird-name">短嘴山椒鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰喉山椒鸟')" data-locations="yingjiang"><span class="bird-name">灰喉山椒鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 卷尾 (4种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('发冠卷尾')" data-locations="yingjiang,ruili"><span class="bird-name">发冠卷尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('古铜色卷尾')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">古铜色卷尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑卷尾')" data-locations="yingjiang,xiniaog"><span class="bird-name">黑卷尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰卷尾')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰卷尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 王鹟与仙鹟 (8种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白尾蓝仙鹟')" data-locations="yingjiang,ruili"><span class="bird-name">白尾蓝仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纯蓝仙鹟')" data-locations="yingjiang"><span class="bird-name">纯蓝仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大仙鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">大仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑枕王鹟')" data-locations="yingjiang"><span class="bird-name">黑枕王鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝喉仙鹟')" data-locations="yingjiang"><span class="bird-name">蓝喉仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('山蓝仙鹟')" data-locations="yingjiang,ruili"><span class="bird-name">山蓝仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小仙鹟')" data-locations="yingjiang,xiniaog"><span class="bird-name">小仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕腹仙鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">棕腹仙鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹟类 (10种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白喉姬鹟')" data-locations="yingjiang,ruili"><span class="bird-name">白喉姬鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('比氏鹟莺')" data-locations="yingjiang,ruili"><span class="bird-name">比氏鹟莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('橙胸姬鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">橙胸姬鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('方尾鹟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">方尾鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄腹鹟莺')" data-locations="yingjiang,ruili"><span class="bird-name">黄腹鹟莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰冠鹟莺')" data-locations="yingjiang"><span class="bird-name">灰冠鹟莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('铜蓝鹟')" data-locations="yingjiang"><span class="bird-name">铜蓝鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小斑姬鹟')" data-locations="yingjiang,ruili"><span class="bird-name">小斑姬鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('玉头姬鹟')" data-locations="yingjiang"><span class="bird-name">玉头姬鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕胸蓝姬鹟')" data-locations="yingjiang,ruili"><span class="bird-name">棕胸蓝姬鹟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鸫类 (14种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白顶溪鸲')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">白顶溪鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白尾蓝地鸲')" data-locations="yingjiang,ruili"><span class="bird-name">白尾蓝地鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白腰鹊鸲')" data-locations="yingjiang,ruili"><span class="bird-name">白腰鹊鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑胸鸫')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">黑胸鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红尾水鸲')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">红尾水鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红胁蓝尾鸲')" data-locations="yingjiang"><span class="bird-name">红胁蓝尾鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰背鸫')" data-locations="yingjiang,ruili"><span class="bird-name">灰背鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰翅鸫')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰翅鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝喉歌鸲')" data-locations="yingjiang"><span class="bird-name">蓝喉歌鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝矶鸫')" data-locations="yingjiang,ruili"><span class="bird-name">蓝矶鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝眉林鸲')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">蓝眉林鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗腹矶鸫')" data-locations="yingjiang,ruili"><span class="bird-name">栗腹矶鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('鹊鸲')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">鹊鸲</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('紫啸鸫')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">紫啸鸫</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 八哥与鸦科 (13种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('八哥')" data-locations="yingjiang"><span class="bird-name">八哥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白领八哥')" data-locations="yingjiang,xiniaog"><span class="bird-name">白领八哥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑椋鸟')" data-locations="yingjiang"><span class="bird-name">斑椋鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大嘴乌鸦')" data-locations="yingjiang,xiniaog"><span class="bird-name">大嘴乌鸦</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑额树鹊')" data-locations="yingjiang,ruili"><span class="bird-name">黑额树鹊</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑领椋鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">黑领椋鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红嘴椋鸟')" data-locations="yingjiang"><span class="bird-name">红嘴椋鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰树鹊')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">灰树鹊</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰头椋鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">灰头椋鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('家八哥')" data-locations="yingjiang"><span class="bird-name">家八哥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蓝绿鹊')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">蓝绿鹊</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('林八哥')" data-locations="yingjiang"><span class="bird-name">林八哥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小嘴乌鸦')" data-locations="yingjiang"><span class="bird-name">小嘴乌鸦</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 伯劳 (3种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('灰背伯劳')" data-locations="yingjiang,ruili"><span class="bird-name">灰背伯劳</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗背伯劳')" data-locations="yingjiang"><span class="bird-name">栗背伯劳</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕背伯劳')" data-locations="yingjiang,xiniaog"><span class="bird-name">棕背伯劳</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹡鸰与鹨类 (4种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白鹡鸰')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">白鹡鸰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄鹡鸰')" data-locations="yingjiang,xiniaog"><span class="bird-name">黄鹡鸰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄头鹡鸰')" data-locations="yingjiang,xiniaog"><span class="bird-name">黄头鹡鸰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰鹡鸰')" data-locations="yingjiang"><span class="bird-name">灰鹡鸰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 雀类 (12种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白腰文鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">白腰文鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('斑文鸟')" data-locations="yingjiang,xiniaog"><span class="bird-name">斑文鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大山雀')" data-locations="yingjiang,xiniaog"><span class="bird-name">大山雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄颊山雀')" data-locations="xiniaog"><span class="bird-name">黄颊山雀</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黄胸织雀')" data-locations="xiniaog"><span class="bird-name">黄胸织雀</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰头鹀')" data-locations="xiniaog"><span class="bird-name">灰头鹀</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('麻雀')" data-locations="yingjiang,ruili"><span class="bird-name">麻雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('冕雀')" data-locations="yingjiang"><span class="bird-name">冕雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('普通朱雀')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">普通朱雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('松雀鹰')" data-locations="yingjiang,ruili"><span class="bird-name">松雀鹰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('小鹀')" data-locations="yingjiang,xiniaog"><span class="bird-name">小鹀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('血雀')" data-locations="yingjiang,ruili"><span class="bird-name">血雀</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹭类 (6种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白鹭')" data-locations="yingjiang"><span class="bird-name">白鹭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('苍鹭')" data-locations="yingjiang,xiniaog"><span class="bird-name">苍鹭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('池鹭')" data-locations="xiniaog"><span class="bird-name">池鹭</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大白鹭')" data-locations="yingjiang"><span class="bird-name">大白鹭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('牛背鹭')" data-locations="yingjiang"><span class="bird-name">牛背鹭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('中白鹭')" data-locations="yingjiang"><span class="bird-name">中白鹭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鸬鹚 (2种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('黑颈鸬鹚')" data-locations="xiniaog"><span class="bird-name">黑颈鸬鹚</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('普通鸬鹚')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">普通鸬鹚</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 鹰隼类 (11种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('苍鹰')" data-locations="yingjiang"><span class="bird-name">苍鹰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('凤头蜂鹰')" data-locations="yingjiang,xiniaog"><span class="bird-name">凤头蜂鹰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('凤头鹰')" data-locations="yingjiang,ruili"><span class="bird-name">凤头鹰</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('红隼')" data-locations="yingjiang,xiniaog"><span class="bird-name">红隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item special" onclick="showBirdInfo('红腿小隼')" data-locations="yingjiang,ruili"><span class="bird-name">⭐ 红腿小隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('林雕')" data-locations="yingjiang,ruili"><span class="bird-name">林雕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('猛隼')" data-locations="yingjiang,ruili"><span class="bird-name">猛隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('普通鵟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">普通鵟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('蛇雕')" data-locations="yingjiang"><span class="bird-name">蛇雕</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('游隼')" data-locations="yingjiang"><span class="bird-name">游隼</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('棕腹隼雕')" data-locations="ruili"><span class="bird-name">棕腹隼雕</span><span class="location-tags"><span class="location-tag tag-ruili">瑞丽</span></span></div>
+            </div>
+        </div>
+        <div class="category">
+            <h3>🐦 其他 (28种)</h3>
+            <div class="bird-list">
+                <div class="bird-item" onclick="showBirdInfo('白斑黑石䳭')" data-locations="yingjiang,xiniaog"><span class="bird-name">白斑黑石䳭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白鹇')" data-locations="xiniaog"><span class="bird-name">白鹇</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白胸苦恶鸟')" data-locations="yingjiang"><span class="bird-name">白胸苦恶鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('白腰草鹬')" data-locations="yingjiang,xiniaog"><span class="bird-name">白腰草鹬</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('彩鹬')" data-locations="yingjiang"><span class="bird-name">彩鹬</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('大盘尾')" data-locations="yingjiang,ruili"><span class="bird-name">大盘尾</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('稻田苇莺')" data-locations="yingjiang"><span class="bird-name">稻田苇莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('鹗')" data-locations="xiniaog"><span class="bird-name">鹗</span><span class="location-tags"><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('钩嘴林鵙')" data-locations="yingjiang,ruili"><span class="bird-name">钩嘴林鵙</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('和平鸟')" data-locations="yingjiang,ruili"><span class="bird-name">和平鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('褐河乌')" data-locations="yingjiang,ruili"><span class="bird-name">褐河乌</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑腹蛇鹈')" data-locations="yingjiang,ruili"><span class="bird-name">黑腹蛇鹈</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑喉缝叶莺')" data-locations="yingjiang,ruili"><span class="bird-name">黑喉缝叶莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑喉石䳭')" data-locations="yingjiang,xiniaog"><span class="bird-name">黑喉石䳭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑头黄鹂')" data-locations="yingjiang,ruili"><span class="bird-name">黑头黄鹂</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('黑鹇')" data-locations="yingjiang,ruili"><span class="bird-name">黑鹇</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('灰林䳭')" data-locations="yingjiang,ruili"><span class="bird-name">灰林䳭</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('矶鹬')" data-locations="yingjiang"><span class="bird-name">矶鹬</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('金眶鸻')" data-locations="yingjiang,xiniaog"><span class="bird-name">金眶鸻</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('栗头织叶莺')" data-locations="yingjiang,ruili"><span class="bird-name">栗头织叶莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('鹩哥')" data-locations="yingjiang,ruili"><span class="bird-name">鹩哥</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('绒额䴓')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">绒额䴓</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('纹背捕蛛鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">纹背捕蛛鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('银耳相思鸟')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">银耳相思鸟</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('长尾缝叶莺')" data-locations="yingjiang,ruili"><span class="bird-name">长尾缝叶莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('长嘴剑鸻')" data-locations="yingjiang"><span class="bird-name">长嘴剑鸻</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('沼泽大尾莺')" data-locations="yingjiang"><span class="bird-name">沼泽大尾莺</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span></span></div>
+                <div class="bird-item" onclick="showBirdInfo('朱鹂')" data-locations="yingjiang,ruili,xiniaog"><span class="bird-name">朱鹂</span><span class="location-tags"><span class="location-tag tag-yingjiang">盈江</span><span class="location-tag tag-ruili">瑞丽</span><span class="location-tag tag-xiniaog">犀鸟谷</span></span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let currentLocation = 'all';
+        function showBirdInfo(birdName) { return false; }
+        function filterLocation(location) {
+            currentLocation = location;
+            document.querySelectorAll('.location-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            const birdItems = document.querySelectorAll('.bird-item');
+            let visibleCount = 0;
+            birdItems.forEach(item => {
+                const locations = item.getAttribute('data-locations') || '';
+                if (location === 'all' || locations.includes(location)) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            document.getElementById('visibleCount').textContent = visibleCount;
+            document.querySelectorAll('.category, .special-birds-section').forEach(section => {
+                const visibleBirds = section.querySelectorAll('.bird-item[style="display: flex;"], .bird-item:not([style*="display: none"])');
+                section.style.display = visibleBirds.length > 0 ? 'block' : 'none';
+            });
+        }
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const birdItems = document.querySelectorAll('.bird-item');
+            let visibleCount = 0;
+            birdItems.forEach(item => {
+                const locations = item.getAttribute('data-locations') || '';
+                const birdName = item.querySelector('.bird-name').textContent.toLowerCase();
+                const locationMatch = currentLocation === 'all' || locations.includes(currentLocation);
+                const searchMatch = birdName.includes(searchTerm);
+                if (locationMatch && searchMatch) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            document.getElementById('visibleCount').textContent = visibleCount;
+            document.querySelectorAll('.category, .special-birds-section').forEach(section => {
+                const visibleBirds = section.querySelectorAll('.bird-item[style="display: flex;"], .bird-item:not([style*="display: none"])');
+                section.style.display = visibleBirds.length > 0 ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>
